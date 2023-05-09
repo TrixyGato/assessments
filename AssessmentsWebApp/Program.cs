@@ -8,16 +8,15 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseStaticFiles(); 
+// app.UseStaticFiles(); 
 
-app.UseStaticFiles(new StaticFileOptions()
-{
-    FileProvider = new PhysicalFileProvider(
-                        Path.Combine(Directory.GetCurrentDirectory(), @"Images")),
-    RequestPath = new PathString("/app-images")
-});
+//app.UseStaticFiles(new StaticFileOptions()
+//{
+//    FileProvider = new PhysicalFileProvider(
+//                        Path.Combine(Directory.GetCurrentDirectory(), @"Images")),
+//    RequestPath = new PathString("/app-images")
+//});
 
-app.UseDeveloperExceptionPage();
 
 app.UseSwagger(c =>
 {
