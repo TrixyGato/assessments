@@ -1,4 +1,5 @@
 using AssessmentsWebApp.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 //app.UseStaticFiles(new StaticFileOptions()
 //{
@@ -16,6 +17,14 @@ var app = builder.Build();
 //                        Path.Combine(Directory.GetCurrentDirectory(), @"Images")),
 //    RequestPath = new PathString("/app-images")
 //});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "MyStaticFiles")),
+    RequestPath = "/StaticFiles"
+});
+
 
 
 app.UseSwagger(c =>
@@ -28,7 +37,7 @@ app.UseSwaggerUI(options =>
     //options.DefaultModelsExpandDepth(-1);
     options.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Assessments API V1");
     options.RoutePrefix = "api/swagger";
-    options.InjectStylesheet("/app-images/dark.css");
+    options.InjectStylesheet("/StaticFiles/style/dark.css");
 });
 
 app.UseHttpsRedirection();
