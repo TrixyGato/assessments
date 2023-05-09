@@ -8,7 +8,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseStaticFiles(); // For the wwwroot folder
+app.UseStaticFiles(); 
 
 app.UseStaticFiles(new StaticFileOptions()
 {
