@@ -17,6 +17,8 @@ app.UseStaticFiles(new StaticFileOptions()
     RequestPath = new PathString("/app-images")
 });
 
+app.UseDeveloperExceptionPage();
+
 app.UseSwagger(c =>
 {
     c.RouteTemplate = "api/swagger/{documentname}/swagger.json";
