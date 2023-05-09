@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseStaticFiles();
+//app.UseStaticFiles();
 
 //app.UseStaticFiles(new StaticFileOptions()
 //{
@@ -37,7 +37,7 @@ app.UseSwaggerUI(options =>
     //options.DefaultModelsExpandDepth(-1);
     options.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Assessments API V1");
     options.RoutePrefix = "api/swagger";
-    options.InjectStylesheet("/StaticFiles/style/dark.css");
+    options.InjectStylesheet("https://drive.google.com/uc?export=view&id=1SLY7ryk-Cw-o46Cprb5hprRh9cKpxfXN");
 });
 
 app.UseHttpsRedirection();
