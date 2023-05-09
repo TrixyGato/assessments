@@ -18,12 +18,12 @@ app.UseStaticFiles();
 //    RequestPath = new PathString("/app-images")
 //});
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "MyStaticFiles")),
-    RequestPath = "/StaticFiles"
-});
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(
+//           Path.Combine(builder.Environment.ContentRootPath, "MyStaticFiles")),
+//    RequestPath = "/StaticFiles"
+//});
 
 
 
