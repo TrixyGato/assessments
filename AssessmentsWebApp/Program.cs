@@ -1,5 +1,7 @@
 using AssessmentsWebApp.Models;
+using FluentAssertions.Common;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +35,7 @@ app.UseSwagger(c =>
 });
 
 app.UseSwaggerUI(options =>
-{
+{   
     //options.DefaultModelsExpandDepth(-1);
     options.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Assessments API V1");
     options.RoutePrefix = "api/swagger";
@@ -62,22 +64,19 @@ app.MapGet("api/student/{id}", (string id) =>
     return Results.Ok(student);
 });
 
-app.MapGet("api/grading", () =>
-{
-    var context = new AssessmentsDbContext();
-    return context.Gradings;
-});
-
-app.MapGet("api/grading/{id}", (string id) =>
+app.MapDelete("api/student/{id}", (string id) =>
 {
     var context = new AssessmentsDbContext();
 
-    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault(); ;
+    var student = context.Students.Where(g => g.Id == id).FirstOrDefault();
 
-    if (grading is null)
+    if (student is null)
         return Results.NotFound($"Grading with id {id} doesnt't exist.");
 
-    return Results.Ok(grading);
+    context.Students.Remove(student);
+
+    context.SaveChanges();
+    return Results.Ok($"Student with id {id} was removed.");
 });
 
 app.MapPost("api/student/", (Student student) =>
@@ -101,16 +100,75 @@ app.MapPost("api/student/", (Student student) =>
     return Results.Ok(newStudent);
 });
 
+app.MapGet("api/grading", () =>
+{
+    var context = new AssessmentsDbContext();
+    return context.Gradings;
+});
+
+app.MapGet("api/grading/{id}", (string id) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault(); ;
+
+    if (grading is null)
+        return Results.NotFound($"Grading with id {id} doesnt't exist.");
+
+    return Results.Ok(grading);
+});
+
 
 app.MapPost("api/grading/", (Grading grading) =>
 {
     var context = new AssessmentsDbContext();
 
-    context.Add(grading);
+    grading.Id = Guid.NewGuid().ToString();
+
+    context.Gradings.Add(grading);
     context.SaveChanges();
 
     return Results.Ok(grading);
 });
+
+
+
+app.MapPut("api/grading/{id}", (Grading updatedGrading, string id) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault();
+
+    if (grading is null)
+        return Results.NotFound($"Grading with id {id} doesnt't exist.");
+
+
+    grading.Grade = updatedGrading.Grade;
+    grading.Comment = updatedGrading.Comment;
+
+    context.Entry(grading).State = EntityState.Modified;
+    context.SaveChanges();
+
+    return Results.Ok(grading);
+});
+
+
+
+app.MapDelete("api/grading/{id}", (string id) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault();
+
+    if (grading is null)
+        return Results.NotFound($"Grading with id {id} doesnt't exist.");
+   
+    context.Gradings.Remove(grading);
+    
+    context.SaveChanges();
+    return Results.Ok($"Grading with id {id} was removed.");
+});
+
 
 
 app.MapGet("api/student&grading", () =>
