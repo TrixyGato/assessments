@@ -112,4 +112,30 @@ app.MapPost("api/grading/", (Grading grading) =>
     return Results.Ok(grading);
 });
 
+
+app.MapGet("api/student&grading", () =>
+{
+    var context = new AssessmentsDbContext();
+
+    var students = context.Students.ToList();
+
+    var student_grading = new List<Student_Grading>();
+
+    foreach (var student in students)
+    {
+        var sg = new Student_Grading()
+        {
+            StudentId = student.Id,
+            Username = student.Username,
+            Grade = context.Gradings.Where(g => g.StudentId == student.Id).FirstOrDefault()?.Grade,
+            Comment = context.Gradings.Where(g => g.StudentId == student.Id).FirstOrDefault()?.Comment,
+        };
+
+        student_grading.Add(sg);
+    }
+
+
+    return Results.Ok(student_grading);
+});
+
 app.Run();
