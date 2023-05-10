@@ -37,7 +37,7 @@ app.UseSwagger(c =>
 });
 
 app.UseSwaggerUI(options =>
-{   
+{
     //options.DefaultModelsExpandDepth(-1);
     options.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Assessments API V1");
     options.RoutePrefix = "api/swagger";
@@ -52,7 +52,7 @@ app.MapGet("api/student", () =>
 {
     var context = new AssessmentsDbContext();
     return context.Students;
-});
+}).WithTags("Get");
 
 app.MapGet("api/student/{id}", (string id) =>
 {
@@ -64,7 +64,7 @@ app.MapGet("api/student/{id}", (string id) =>
         return Results.NotFound($"Student with id {id} doesnt't exist.");
 
     return Results.Ok(student);
-});
+}).WithTags("Get");
 
 app.MapDelete("api/student/{id}", (string id) =>
 {
@@ -79,7 +79,7 @@ app.MapDelete("api/student/{id}", (string id) =>
 
     context.SaveChanges();
     return Results.Ok($"Student with id {id} was removed.");
-});
+}).WithTags("Delete");
 
 app.MapPost("api/student/", (Student student) =>
 {
@@ -100,13 +100,13 @@ app.MapPost("api/student/", (Student student) =>
     context.SaveChanges();
 
     return Results.Ok(newStudent);
-});
+}).WithTags("Post");
 
 app.MapGet("api/grading", () =>
 {
     var context = new AssessmentsDbContext();
     return context.Gradings;
-});
+}).WithTags("Get");
 
 app.MapGet("api/grading/{id}", (string id) =>
 {
@@ -118,7 +118,7 @@ app.MapGet("api/grading/{id}", (string id) =>
         return Results.NotFound($"Grading with id {id} doesnt't exist.");
 
     return Results.Ok(grading);
-});
+}).WithTags("Get");
 
 
 app.MapPost("api/grading/", (Grading grading) =>
@@ -131,9 +131,7 @@ app.MapPost("api/grading/", (Grading grading) =>
     context.SaveChanges();
 
     return Results.Ok(grading);
-});
-
-
+}).WithTags("Post");
 
 app.MapPut("api/grading/{id}", (Grading updatedGrading, string id) =>
 {
@@ -152,7 +150,7 @@ app.MapPut("api/grading/{id}", (Grading updatedGrading, string id) =>
     context.SaveChanges();
 
     return Results.Ok(grading);
-});
+}).WithTags("Put");
 
 
 
@@ -164,12 +162,12 @@ app.MapDelete("api/grading/{id}", (string id) =>
 
     if (grading is null)
         return Results.NotFound($"Grading with id {id} doesnt't exist.");
-   
+
     context.Gradings.Remove(grading);
-    
+
     context.SaveChanges();
     return Results.Ok($"Grading with id {id} was removed.");
-});
+}).WithTags("Delete");
 
 
 
@@ -194,8 +192,7 @@ app.MapGet("api/student&grading", () =>
         student_grading.Add(sg);
     }
 
-
     return Results.Ok(student_grading);
-});
+}).WithTags("Get");
 
 app.Run();
