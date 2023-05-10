@@ -29,21 +29,20 @@ public partial class AssessmentsDbContext : DbContext
     {
         modelBuilder.Entity<Grading>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Grading__3214EC07BD955863");
+            entity.HasKey(e => e.Id).HasName("PK__Grading__3214EC07A20E4EFB");
 
             entity.ToTable("Grading");
 
+            entity.Property(e => e.Id)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.Comment)
-                .HasMaxLength(999)
+                .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.StudentId)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-
-            entity.HasOne(d => d.Student).WithMany(p => p.Gradings)
-                .HasForeignKey(d => d.StudentId)
-                .HasConstraintName("FK__Grading__Student__71D1E811");
         });
 
         modelBuilder.Entity<Student>(entity =>

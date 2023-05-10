@@ -68,7 +68,7 @@ app.MapGet("api/grading", () =>
     return context.Gradings;
 });
 
-app.MapGet("api/grading/{id}", (int id) =>
+app.MapGet("api/grading/{id}", (string id) =>
 {
     var context = new AssessmentsDbContext();
 
