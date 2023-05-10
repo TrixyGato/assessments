@@ -43,6 +43,10 @@ public partial class AssessmentsDbContext : DbContext
             entity.Property(e => e.StudentId)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.Student).WithMany(p => p.Gradings)
+                .HasForeignKey(d => d.StudentId)
+                .HasConstraintName("FK__Grading__Student__7B5B524B");
         });
 
         modelBuilder.Entity<Student>(entity =>
