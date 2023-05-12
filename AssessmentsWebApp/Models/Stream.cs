@@ -4,11 +4,15 @@ using System.Text.Json.Serialization;
 
 namespace AssessmentsWebApp.Models;
 
-public partial class Student
+public partial class Stream
 {
     public string Id { get; set; } = null!;
 
-    public string? Username { get; set; }
+    public string? Name { get; set; }
+
+    public DateTime? DateStart { get; set; }
+
+    public DateTime? DateEnd { get; set; }
 
 
     [JsonIgnore]

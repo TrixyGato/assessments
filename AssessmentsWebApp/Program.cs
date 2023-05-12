@@ -3,6 +3,7 @@ using FluentAssertions.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Stream = AssessmentsWebApp.Models.Stream;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,7 +113,7 @@ app.MapGet("api/grading/{id}", (string id) =>
 {
     var context = new AssessmentsDbContext();
 
-    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault(); ;
+    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault();
 
     if (grading is null)
         return Results.NotFound($"Grading with id {id} doesnt't exist.");
@@ -120,6 +121,18 @@ app.MapGet("api/grading/{id}", (string id) =>
     return Results.Ok(grading);
 }).WithTags("Get");
 
+
+app.MapGet("api/gradings/{studentId}", (string studentId) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var grading = context.Gradings.Where(g => g.StudentId == studentId).ToList();
+
+    if (grading is null)
+        return Results.NotFound($"Grading with id {studentId} doesnt't exist.");
+
+    return Results.Ok(grading);
+}).WithTags("Get");
 
 app.MapPost("api/grading/", (Grading grading) =>
 {
@@ -170,6 +183,21 @@ app.MapDelete("api/grading/{id}", (string id) =>
 }).WithTags("Delete");
 
 
+app.MapDelete("api/stream/{id}", (string id) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var stream = context.Streams.Where(g => g.Id == id).FirstOrDefault();
+
+    if (stream is null)
+        return Results.NotFound($"Stream with id {id} doesnt't exist.");
+
+    context.Streams.Remove(stream);
+
+    context.SaveChanges();
+    return Results.Ok($"Stream with id {id} was removed.");
+}).WithTags("Delete");
+
 
 app.MapGet("api/student&grading", () =>
 {
@@ -193,6 +221,128 @@ app.MapGet("api/student&grading", () =>
     }
 
     return Results.Ok(student_grading);
+}).WithTags("Get");
+
+
+app.MapPost("api/start_stream/", (Stream stream) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var newStream = new Stream();
+
+    newStream.DateStart = DateTime.Now;
+    newStream.Id = Guid.NewGuid().ToString();
+    newStream.Name = stream.Name;
+
+
+    context.Streams.Add(newStream);
+    context.SaveChanges();
+
+    return Results.Ok(newStream);
+}).WithTags("Post");
+
+app.MapPost("api/end_stream/", (Stream stream) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var foundStream = context.Streams.Where(g => g.Id == stream.Id).FirstOrDefault();
+
+    if (foundStream is null)
+        return Results.NotFound($"Stream with id {stream.Id} doesnt't exist.");
+
+
+    foundStream.DateEnd = DateTime.Now;
+
+    context.Entry(foundStream).State = EntityState.Modified;
+    context.SaveChanges();
+
+    return Results.Ok(foundStream);
+}).WithTags("Post");
+
+
+app.MapPost("api/teacher/", (Teacher teacher) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var isTeacherUnique = context.Teachers.Where(s => s.Username == teacher.Username).FirstOrDefault();
+
+    if (isTeacherUnique != null)
+    {
+        return Results.BadRequest($"Teacher with username {teacher.Username} already exist.");
+    }
+
+    teacher.Id = Guid.NewGuid().ToString();  
+
+    context.Teachers.Add(teacher);
+    context.SaveChanges();
+
+    return Results.Ok(teacher);
+}).WithTags("Post");
+
+app.MapPost("api/subject/", (Subject subject) =>
+{
+    var context = new AssessmentsDbContext(); 
+
+    subject.Id = Guid.NewGuid().ToString();
+
+    context.Subjects.Add(subject);
+    context.SaveChanges();
+
+    return Results.Ok(subject);
+}).WithTags("Post");
+
+
+app.MapDelete("api/teacher/{id}", (string id) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var teacher = context.Teachers.Where(g => g.Id == id).FirstOrDefault();
+
+    if (teacher is null)
+        return Results.NotFound($"Teacher with id {id} doesnt't exist.");
+
+    context.Teachers.Remove(teacher);
+
+    context.SaveChanges();
+    return Results.Ok($"Teacher with id {id} was removed.");
+}).WithTags("Delete");
+
+
+app.MapDelete("api/subject/{id}", (string id) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var subject = context.Subjects.Where(g => g.Id == id).FirstOrDefault();
+
+    if (subject is null)
+        return Results.NotFound($"Teacher with id {id} doesnt't exist.");
+
+    context.Subjects.Remove(subject);
+
+    context.SaveChanges();
+    return Results.Ok($"Subject with id {id} was removed.");
+}).WithTags("Delete");
+
+app.MapGet("api/teacher/", () =>
+{
+    var context = new AssessmentsDbContext();
+
+    return Results.Ok(context.Teachers);
+}).WithTags("Get");
+
+app.MapGet("api/stream/", () =>
+{
+    var context = new AssessmentsDbContext();
+
+    return Results.Ok(context.Streams);
+}).WithTags("Get");
+
+
+app.MapGet("api/subject/", () =>
+{
+    var context = new AssessmentsDbContext();
+
+    return Results.Ok(context.Subjects);
 }).WithTags("Get");
 
 app.Run();
