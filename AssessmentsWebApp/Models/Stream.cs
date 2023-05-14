@@ -14,7 +14,9 @@ public partial class Stream
 
     public DateTime? DateEnd { get; set; }
 
-
     [JsonIgnore]
     public virtual ICollection<Grading> Gradings { get; set; } = new List<Grading>();
+
+    [JsonIgnore]
+    public virtual ICollection<StreamStudent> StreamStudents { get; set; } = new List<StreamStudent>();
 }

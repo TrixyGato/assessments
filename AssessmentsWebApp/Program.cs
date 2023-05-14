@@ -1,4 +1,5 @@
 using AssessmentsWebApp.Models;
+using AssessmentsWebApp.Models.POSTModels;
 using FluentAssertions.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -152,14 +153,14 @@ app.MapPost("api/grading/", (Grading grading) =>
     return Results.Ok(grading);
 }).WithTags("Post");
 
-app.MapPut("api/grading/{id}", (Grading updatedGrading, string id) =>
+app.MapPut("api/grading/{gradingId}", (Grading updatedGrading, string gradingId) =>
 {
     var context = new AssessmentsDbContext();
 
-    var grading = context.Gradings.Where(g => g.Id == id).FirstOrDefault();
+    var grading = context.Gradings.Where(g => g.Id == gradingId).FirstOrDefault();
 
     if (grading is null)
-        return Results.NotFound($"Grading with id {id} doesnt't exist.");
+        return Results.NotFound($"Grading with id {gradingId} doesnt't exist.");
 
 
     grading.Grade = updatedGrading.Grade;
@@ -203,31 +204,6 @@ app.MapDelete("api/stream/{id}", (string id) =>
     context.SaveChanges();
     return Results.Ok($"Stream with id {id} was removed.");
 }).WithTags("Delete");
-
-
-app.MapGet("api/student&grading", () =>
-{
-    var context = new AssessmentsDbContext();
-
-    var students = context.Students.ToList();
-
-    var student_grading = new List<Student_Grading>();
-
-    foreach (var student in students)
-    {
-        var sg = new Student_Grading()
-        {
-            StudentId = student.Id,
-            Username = student.Username,
-            Grade = context.Gradings.Where(g => g.StudentId == student.Id).FirstOrDefault()?.Grade,
-            Comment = context.Gradings.Where(g => g.StudentId == student.Id).FirstOrDefault()?.Comment,
-        };
-
-        student_grading.Add(sg);
-    }
-
-    return Results.Ok(student_grading);
-}).WithTags("Get");
 
 
 app.MapPost("api/start_stream/", (Stream stream) =>
@@ -349,6 +325,82 @@ app.MapGet("api/subject/", () =>
     var context = new AssessmentsDbContext();
 
     return Results.Ok(context.Subjects);
+}).WithTags("Get");
+
+
+app.MapPost("api/stream_student/", (StreamStudentModel streamStudentModel) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var isStudentUnique = context.Students.Where(s => s.Username == streamStudentModel.Student.Username).FirstOrDefault();
+
+    if (isStudentUnique != null)
+    {
+        var streamStudent = new StreamStudent();
+
+        streamStudent.StudentId = isStudentUnique.Id;
+        streamStudent.StreamId = streamStudentModel.StreamId;
+        streamStudent.Id = Guid.NewGuid().ToString();
+
+        context.StreamStudents.Add(streamStudent);
+        context.SaveChanges();
+
+        return Results.Ok(streamStudent);
+    }
+
+    var newStudent = streamStudentModel.Student;
+    newStudent.Id = Guid.NewGuid().ToString();
+
+    context.Students.Add(newStudent);
+
+    var newStreamStudent = new StreamStudent();
+
+    newStreamStudent.StudentId = newStudent.Id;
+    newStreamStudent.StreamId = streamStudentModel.StreamId;
+    newStreamStudent.Id = Guid.NewGuid().ToString();
+
+    context.StreamStudents.Add(newStreamStudent);
+    context.SaveChanges();
+
+    return Results.Ok(newStreamStudent);
+
+}).WithTags("Post");
+
+app.MapGet("api/student&grading/{streamId}", (string streamId) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var foundStream = context.Streams.Where(g => g.Id == streamId).FirstOrDefault();
+
+    if (foundStream is null)
+    {
+        return Results.NotFound($"Stream with id {streamId} doesnt't exist.");
+    }
+
+    var streamStudents = context.StreamStudents.Where(s=>s.StreamId == streamId).ToList();
+
+    var student_grading = new List<Student_Grading>();
+
+    foreach (var student in streamStudents)
+    {
+        var foundStudent = context.Students.Where(s => s.Id == student.StudentId).FirstOrDefault();
+
+        //var grade = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Grade;
+        //var comment = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Comment,
+
+        var sg = new Student_Grading()
+        {
+
+            StudentId = foundStudent.Id,
+            Username = foundStudent.Username,
+            Grade = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Grade,
+            Comment = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Comment,
+        };
+
+        student_grading.Add(sg);
+    }
+
+    return Results.Ok(student_grading);
 }).WithTags("Get");
 
 app.Run();

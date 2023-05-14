@@ -10,7 +10,6 @@ public partial class Teacher
 
     public string? Username { get; set; }
 
-
     [JsonIgnore]
     public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
 }

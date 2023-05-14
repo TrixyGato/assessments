@@ -10,7 +10,9 @@ public partial class Student
 
     public string? Username { get; set; }
 
-
     [JsonIgnore]
     public virtual ICollection<Grading> Gradings { get; set; } = new List<Grading>();
+
+    [JsonIgnore]
+    public virtual ICollection<StreamStudent> StreamStudents { get; set; } = new List<StreamStudent>();
 }

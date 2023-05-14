@@ -19,6 +19,8 @@ public partial class AssessmentsDbContext : DbContext
 
     public virtual DbSet<Stream> Streams { get; set; }
 
+    public virtual DbSet<StreamStudent> StreamStudents { get; set; }
+
     public virtual DbSet<Student> Students { get; set; }
 
     public virtual DbSet<Subject> Subjects { get; set; }
@@ -67,6 +69,25 @@ public partial class AssessmentsDbContext : DbContext
             entity.Property(e => e.DateEnd).HasColumnType("datetime");
             entity.Property(e => e.DateStart).HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<StreamStudent>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__StreamSt__3214EC0789F6BCD5");
+
+            entity.ToTable("StreamStudent");
+
+            entity.Property(e => e.Id).HasMaxLength(255);
+            entity.Property(e => e.StreamId).HasMaxLength(255);
+            entity.Property(e => e.StudentId).HasMaxLength(255);
+
+            entity.HasOne(d => d.Stream).WithMany(p => p.StreamStudents)
+                .HasForeignKey(d => d.StreamId)
+                .HasConstraintName("FK__StreamStu__Strea__160F4887");
+
+            entity.HasOne(d => d.Student).WithMany(p => p.StreamStudents)
+                .HasForeignKey(d => d.StudentId)
+                .HasConstraintName("FK__StreamStu__Stude__17036CC0");
         });
 
         modelBuilder.Entity<Student>(entity =>

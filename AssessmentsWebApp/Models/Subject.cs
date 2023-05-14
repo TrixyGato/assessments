@@ -12,7 +12,6 @@ public partial class Subject
 
     public string? TeacherId { get; set; }
 
-
     [JsonIgnore]
     public virtual ICollection<Grading> Gradings { get; set; } = new List<Grading>();
 
