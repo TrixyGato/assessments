@@ -393,6 +393,7 @@ app.MapGet("api/student&grading/{streamId}", (string streamId) =>
 
             StudentId = foundStudent.Id,
             Username = foundStudent.Username,
+            GradingId = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Id,
             Grade = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Grade,
             Comment = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Comment,
         };

@@ -8,6 +8,8 @@ namespace AssessmentsWebApp.Models
 
         public string? Username { get; set; }
 
+        public string? GradingId { get; set; }
+
         public int? Grade { get; set; }
 
         public string? Comment { get; set; }
