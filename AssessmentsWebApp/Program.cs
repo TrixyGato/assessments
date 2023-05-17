@@ -19,26 +19,6 @@ app.UseCors(builder => builder.AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod());
 
-
-//app.UseCors(builder => builder.AllowAnyOrigin());
-//app.UseStaticFiles();
-
-//app.UseStaticFiles(new StaticFileOptions()
-//{
-//    FileProvider = new PhysicalFileProvider(
-//                        Path.Combine(Directory.GetCurrentDirectory(), @"Images")),
-//    RequestPath = new PathString("/app-images")
-//});
-
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(
-//           Path.Combine(builder.Environment.ContentRootPath, "MyStaticFiles")),
-//    RequestPath = "/StaticFiles"
-//});
-
-
-
 app.UseSwagger(c =>
 {
     c.RouteTemplate = "api/swagger/{documentname}/swagger.json";
@@ -384,9 +364,6 @@ app.MapGet("api/student&grading/{streamId}", (string streamId) =>
     foreach (var student in streamStudents)
     {
         var foundStudent = context.Students.Where(s => s.Id == student.StudentId).FirstOrDefault();
-
-        //var grade = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Grade;
-        //var comment = context.Gradings.Where(g => g.StudentId == foundStudent.Id && g.StreamId == streamId).FirstOrDefault()?.Comment,
 
         var sg = new Student_Grading()
         {
