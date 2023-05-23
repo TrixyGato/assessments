@@ -1,6 +1,8 @@
 using AssessmentsWebApp.Models;
 using AssessmentsWebApp.Models.POSTModels;
+using AssessmentsWebApp.Models.RESPONSEModel;
 using FluentAssertions.Common;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -117,6 +119,10 @@ app.MapGet("api/gradings/{studentId}", (string studentId) =>
 
     if (grading is null)
         return Results.NotFound($"Grading with id {studentId} doesnt't exist.");
+
+    foreach (var g in grading) {
+        g.SubjectId = context.Subjects.Where(s => s.Id == g.SubjectId).FirstOrDefault().Name;
+    }
 
     return Results.Ok(grading);
 }).WithTags("Get");
@@ -346,7 +352,7 @@ app.MapPost("api/stream_student/", (StreamStudentModel streamStudentModel) =>
 
 }).WithTags("Post");
 
-app.MapGet("api/student&grading/{streamId}", (string streamId) =>
+app.MapGet("api/student_grading/{streamId}", (string streamId) =>
 {
     var context = new AssessmentsDbContext();
 
@@ -377,8 +383,39 @@ app.MapGet("api/student&grading/{streamId}", (string streamId) =>
 
         student_grading.Add(sg);
     }
-
     return Results.Ok(student_grading);
 }).WithTags("Get");
+
+app.MapGet("api/teacher_gradings/{teacherId}", (string teacherId) =>
+{
+    var context = new AssessmentsDbContext();
+
+    var teacherSubjects = context.Subjects.Where(s=> s.TeacherId==teacherId).ToList();
+
+    List<string> subjectsList = teacherSubjects.Select(s => s.Id).ToList();
+
+    var filteredGrading = context.Gradings.Where(g => subjectsList.Contains(g.SubjectId)).ToList();
+
+    if (filteredGrading is null)
+        return Results.NotFound($"Gradings with teacher id {teacherId} doesnt't exist.");
+
+
+    List<Teacher_Gradings> result = new List<Teacher_Gradings>();
+
+    foreach (var f in filteredGrading) {
+        result.Add(new Teacher_Gradings
+        {
+            Grade = f.Grade,
+            Comment = f.Comment,
+            Date = f.Date,
+            StudentName = context.Students.Where(s=> s.Id == f.StudentId).FirstOrDefault().Username,
+            StreamName = context.Streams.Where(s => s.Id == f.StreamId).FirstOrDefault().Name,
+            subjectName = context.Subjects.Where(s => s.Id == f.SubjectId).FirstOrDefault().Name
+        });
+    }
+
+    return Results.Ok(result);
+}).WithTags("Get");
+
 
 app.Run();

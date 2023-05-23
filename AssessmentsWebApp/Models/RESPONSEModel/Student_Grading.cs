@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AssessmentsWebApp.Models
+namespace AssessmentsWebApp.Models.RESPONSEModel
 {
     public class Student_Grading
     {
